@@ -95,9 +95,9 @@ wait
 # Compatibility topic
 p ""
 p "Display the topic compatibility"
-p "curl --silent --basic -X GET -H \"Content-Type: application/vnd.schemaregistry.v1+json\" $SR_URL/config/$TOPIC-value?defaultToGlobal=true | jq ."
+p "curl --silent --basic -X GET -H \"Content-Type: application/vnd.schemaregistry.v1+json\" \"$SR_URL/config/$TOPIC-value?defaultToGlobal=true\" | jq ."
 wait
-curl --silent --basic -X GET -H "Content-Type: application/vnd.schemaregistry.v1+json" $SR_URL/config/$TOPIC-value?defaultToGlobal=true | jq .
+curl --silent --basic -X GET -H "Content-Type: application/vnd.schemaregistry.v1+json" "$SR_URL/config/$TOPIC-value?defaultToGlobal=true" | jq .
 wait
 # Change Compatibility
 p ""
