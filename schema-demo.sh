@@ -115,7 +115,15 @@ pe "kafka-avro-console-producer \
     --broker-list $KAFKA_URL \
     --property schema.registry.url=$SR_URL \
     --topic $TOPIC \
-    --property value.schema='{\"type\": \"record\",\"name\": \"Payment\",\"namespace\": \"io.confluent.examples.clients.basicavro\",\"fields\": [{\"name\": \"id\",\"type\": \"string\"},{\"name\": \"amount\",\"type\": \"double\"}]}'"
+    --property value.schema='{\"type\": \"record\",\"name\": \"Payment\",\"namespace\": \"io.confluent.examples.clients.basicavro\",\"fields\": [{\"name\": \"id\",\"type\": \"string\"},{\"name\": \"amount\",\"type\": \"double\"}]}' << EOF
+{\"id\": \"1\",\"amount\": 10}
+{\"id\": \"2\",\"amount\": 10}
+{\"id\": \"3\",\"amount\": 10}
+{\"id\": \"5\",\"amount\": 10}
+{\"id\": \"6\",\"amount\": 10}
+{\"id\": \"4\",\"amount\": 10}
+{\"id\": \"7\",\"amount\": 10}
+EOF"
 # kafka-avro-console-producer \
 #     --broker-list $KAFKA_URL \
 #     --property schema.registry.url=$SR_URL \
@@ -123,13 +131,7 @@ pe "kafka-avro-console-producer \
 #     --property basic.auth.credentials.source=USER_INFO \
 #     --topic $TOPIC \
 #     --property value.schema='{"type": "record","name": "Payment","namespace": "io.confluent.examples.clients.basicavro","fields": [{"name": "id","type": "string"},{"name": "amount","type": "double"}]}'
-# {"id": "1","amount": 10}
-# {"id": "2","amount": 10}
-# {"id": "3","amount": 10}
-# {"id": "5","amount": 10}
-# {"id": "6","amount": 10}
-# {"id": "4","amount": 10}
-# {"id": "7","amount": 10}
+
 
 wait
 #
@@ -165,7 +167,15 @@ pe "kafka-avro-console-producer \
     --broker-list $KAFKA_URL \
     --property schema.registry.url=$SR_URL \
     --topic $TOPIC \
-    --property value.schema='{\"type\": \"record\",\"name\": \"Payment\",\"namespace\": \"io.confluent.examples.clients.basicavro\",\"fields\": [{\"name\": \"id\",\"type\": \"string\"},{\"name\": \"amount\",\"type\": \"double\"},{\"name\": \"newfield\", \"type\": \"string\"}]}'"
+    --property value.schema='{\"type\": \"record\",\"name\": \"Payment\",\"namespace\": \"io.confluent.examples.clients.basicavro\",\"fields\": [{\"name\": \"id\",\"type\": \"string\"},{\"name\": \"amount\",\"type\": \"double\"},{\"name\": \"newfield\", \"type\": \"string\"}]}' << EOF
+{\"id\": \"11\",\"amount\": 10,\"newfield\": \"sample123\"}
+{\"id\": \"22\",\"amount\": 10,\"newfield\": \"sample123\"}
+{\"id\": \"33\",\"amount\": 10,\"newfield\": \"sample123\"}
+{\"id\": \"44\",\"amount\": 10,\"newfield\": \"sample123\"}
+{\"id\": \"55\",\"amount\": 10,\"newfield\": \"sample123\"}
+{\"id\": \"66\",\"amount\": 10,\"newfield\": \"sample123\"}
+{\"id\": \"77\",\"amount\": 10,\"newfield\": \"sample123\"}
+EOF"
 
 # kafka-avro-console-producer \
 #     --broker-list $KAFKA_URL \
