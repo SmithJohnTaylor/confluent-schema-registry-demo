@@ -19,6 +19,7 @@ echo $TOPIC
 #------------------------------#
 echo
 echo -e "${GREEN}Creating topic${NC}"
+echo "kafka-topics --bootstrap-server $KAFKA_URL --create --topic $TOPIC --partitions 1 --replication-factor 1"
 kafka-topics --bootstrap-server $KAFKA_URL --create --topic $TOPIC --partitions 1 --replication-factor 1
 read -p "Press enter to continue"
 ################################
@@ -114,6 +115,11 @@ read -p "Press enter to continue"
 #------------------------------#
 echo
 echo -e "${GREEN}Produce messages with the schema -> {\"id\": \"1\",\"amount\": 10}${NC}"
+echo "kafka-avro-console-producer \
+    --broker-list $KAFKA_URL \
+    --property schema.registry.url=$SR_URL \
+    --topic $TOPIC \
+    --property value.schema='{\"type\": \"record\",\"name\": \"Payment\",\"namespace\": \"io.confluent.examples.clients.basicavro\",\"fields\": [{\"name\": \"id\",\"type\": \"string\"},{\"name\": \"amount\",\"type\": \"double\"}]}'"
 kafka-avro-console-producer \
     --broker-list $KAFKA_URL \
     --property schema.registry.url=$SR_URL \
@@ -127,6 +133,7 @@ kafka-avro-console-producer \
 {"id": "4","amount": 10}
 {"id": "7","amount": 10}
 EOF
+echo "{\"id\": \"1\",\"amount\": 10}"
 read -p "Press enter to continue"
 
 #------------------------------#
@@ -134,7 +141,6 @@ read -p "Press enter to continue"
 #------------------------------#
 echo
 echo -e "${GREEN}Attempt to register an incompatible schema${NC}"
-echo
 echo "{
   \"type\": \"record\",
   \"name\": \"Payment\",
@@ -178,6 +184,7 @@ echo "curl --silent --basic -X PUT -H \"Content-Type: application/vnd.schemaregi
 curl --silent --basic -X PUT -H "Content-Type: application/vnd.schemaregistry.v1+json" --data '{"compatibility":"NONE"}' $SR_URL/config/$TOPIC-value | jq .
 read -p "Press enter to continue"
 
+echo
 echo -e "${GREEN}Try again -> {\"id\": \"111\",\"amount\": 10,\"newfield\": \"sample123\"}${NC}"
 echo "kafka-avro-console-producer \
     --broker-list $KAFKA_URL \
@@ -191,7 +198,8 @@ kafka-avro-console-producer \
     --property value.schema='{"type": "record","name": "Payment","namespace": "io.confluent.examples.clients.basicavro","fields": [{"name": "id","type": "string"},{"name": "amount","type": "double"},{"name": "newfield", "type": "string"}]}' << EOF
 {"id": "111","amount": 10,"newfield": "sample123"}
 EOF
-
+echo "{id: 111,amount: 10,newfield: sample123}"
+read -p "Press enter to continue"
 
 #------------------------------#
 # Listing schema versions on our topic
@@ -202,13 +210,16 @@ echo "curl --silent --basic -X GET $SR_URL/subjects/$TOPIC-value/versions | jq .
 curl --silent --basic -X GET $SR_URL/subjects/$TOPIC-value/versions | jq .
 read -p "Press enter to continue"
 
+#------------------------------#
+# Consume Avro messages
+#------------------------------#
 echo
 echo -e "${GREEN}Consume the messages${NC}"
+echo "kafka-avro-console-consumer --bootstrap-server $KAFKA_URL --property schema.registry.url=$SR_URL --topic $TOPIC --from-beginning"
 kafka-avro-console-consumer \
     --bootstrap-server $KAFKA_URL \
     --property schema.registry.url=$SR_URL \
     --topic $TOPIC \
     --from-beginning
 
-read -p "Press enter to continue"
 echo -e "${GREEN}Fin${NC}"
