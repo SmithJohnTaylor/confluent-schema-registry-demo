@@ -1,58 +1,54 @@
 #!/usr/bin/env bash
 
-########################
-# include the magic
-########################
-. demo-magic.sh -d
-
-#TYPE_SPEED=60
-DEMO_PROMPT="${GREEN}➜ ${CYAN}\W "
-
-clear
-
-########################
-# end demo magic config
-########################
-
 TOPIC=$1
 KAFKA_URL=localhost:9092
 SR_URL=http://localhost:8081
 
-p "TopicName"
+echo "TopicName"
 echo $TOPIC
 
-# Creating 'schema-demo' topic
-p ""
-p "Create topic "
-wait
-pe "kafka-topics --bootstrap-server $KAFKA_URL --create --topic $TOPIC --partitions 1 --replication-factor 1"
+#------------------------------#
+# Creating 'schema-demo' topic #
+#------------------------------#
+echo
+echo "Create topic "
+kafka-topics --bootstrap-server $KAFKA_URL --create --topic $TOPIC --partitions 1 --replication-factor 1
+read -p "Press enter to continue"
+################################
 
+#------------------------------#
 # Listing topics
-p ""
-p "List Topics"
-wait
-pe "kafka-topics --bootstrap-server $KAFKA_URL --list"
+#------------------------------#
+echo
+echo "Listing Topics"
+echo "kafka-topics --bootstrap-server $KAFKA_URL --list"
+kafka-topics --bootstrap-server $KAFKA_URL --list | awk '!/_/{print }'
+read -p "Press enter to continue"
 
-
+#------------------------------#
 # List schemas
-p ""
-p "List all Subjects and Schemas"
-wait
-pe "curl --silent --basic -X GET $SR_URL/subjects | jq ."
-wait
+#------------------------------#
+echo
+echo "List all Subjects and Schemas"
+echo "curl --silent --basic -X GET $SR_URL/subjects | jq ."
+curl --silent --basic -X GET $SR_URL/subjects | jq .
+read -p "Press enter to continue"
 
+#------------------------------#
 # Compatibility
-p ""
-p "Listing global schema compatibility level"
-wait
-pe "curl --silent --basic -X GET $SR_URL/config | jq ."
-wait
+#------------------------------#
+echo
+echo "Listing global schema compatibility level"
+echo "curl --silent --basic -X GET $SR_URL/config | jq ."
+curl --silent --basic -X GET $SR_URL/config | jq .
+read -p "Press enter to continue"
 
+#------------------------------#
 # Register manually
+#------------------------------#
 ## Print the schema
-p ""
-p "Introducing a new schema"
-wait
+echo
+echo "Introducing a new schema"
 echo "{
   \"type\": \"record\",
   \"name\": \"Payment\",
@@ -68,70 +64,68 @@ echo "{
     }
   ]
 }"
-wait
+read -p "Press enter to continue"
 
 ## Register it
-p ""
-p "Manual register the schema"
-p "curl -X POST -H \"Content-Type: application/vnd.schemaregistry.v1+json\" --data '{\"schema\": \"{\"type\":\"record\",\"name\":\"Payment\",\"namespace\":\"io.confluent.examples.clients.basicavro\",\"fields\":[{\"name\":\"id\",\"type\":\"string\"},{\"name\":\"amount\",\"type\":\"double\"}]}\"}' $SR_URL/subjects/$TOPIC-value/versions"
-wait
+echo
+echo "Manual register the schema"
+echo "curl -X POST -H \"Content-Type: application/vnd.schemaregistry.v1+json\" --data '{\"schema\": \"{\"type\":\"record\",\"name\":\"Payment\",\"namespace\":\"io.confluent.examples.clients.basicavro\",\"fields\":[{\"name\":\"id\",\"type\":\"string\"},{\"name\":\"amount\",\"type\":\"double\"}]}\"}' $SR_URL/subjects/$TOPIC-value/versions"
 curl -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" --data '{"schema": "{\"type\":\"record\",\"name\":\"Payment\",\"namespace\":\"io.confluent.examples.clients.basicavro\",\"fields\":[{\"name\":\"id\",\"type\":\"string\"},{\"name\":\"amount\",\"type\":\"double\"}]}"}' $SR_URL/subjects/$TOPIC-value/versions | jq .
-wait
+read -p "Press enter to continue"
 
+#------------------------------#
 # Listing schema versions on our topic
-p ""
-p "List the number of versions"
-p "curl --silent --basic -X GET $SR_URL/subjects/$TOPIC-value/versions | jq ."
-wait
+#------------------------------#
+echo
+echo "List the number of versions"
+echo "curl --silent --basic -X GET $SR_URL/subjects/$TOPIC-value/versions | jq ."
 curl --silent --basic -X GET $SR_URL/subjects/$TOPIC-value/versions | jq .
-wait
-# Display latest schema
-p ""
-p "Display latest schema"
-p "curl --silent --basic -X GET $SR_URL/subjects/$TOPIC-value/versions/latest/schema | jq ."
-wait
-curl --silent --basic -X GET $SR_URL/subjects/$TOPIC-value/versions/latest/schema | jq .
-wait
-# Compatibility topic
-p ""
-p "Display the topic compatibility"
-p "curl --silent --basic -X GET -H \"Content-Type: application/vnd.schemaregistry.v1+json\" \"$SR_URL/config/$TOPIC-value?defaultToGlobal=true\" | jq ."
-wait
-curl --silent --basic -X GET -H "Content-Type: application/vnd.schemaregistry.v1+json" "$SR_URL/config/$TOPIC-value?defaultToGlobal=true" | jq .
-wait
-# Change Compatibility
-p ""
-p "Change the compatibility to NONE"
-p "curl --silent --basic -X PUT -H \"Content-Type: application/vnd.schemaregistry.v1+json\" --data '{\"compatibility\":\"NONE\"}' $SR_URL/config/$TOPIC-value | jq ."
-wait
-curl --silent --basic -X PUT -H "Content-Type: application/vnd.schemaregistry.v1+json" --data '{"compatibility":"NONE"}' $SR_URL/config/$TOPIC-value | jq .
-wait
+read -p "Press enter to continue"
 
+#------------------------------#
+# Display latest schema
+#------------------------------#
+echo
+echo "Display latest schema"
+echo "curl --silent --basic -X GET $SR_URL/subjects/$TOPIC-value/versions/latest/schema | jq ."
+curl --silent --basic -X GET $SR_URL/subjects/$TOPIC-value/versions/latest/schema | jq .
+read -p "Press enter to continue"
+
+#------------------------------#
+# Compatibility topic
+#------------------------------#
+echo
+echo "Display the topic compatibility"
+echo "curl --silent --basic -X GET -H \"Content-Type: application/vnd.schemaregistry.v1+json\" \"$SR_URL/config/$TOPIC-value?defaultToGlobal=true\" | jq ."
+curl --silent --basic -X GET -H "Content-Type: application/vnd.schemaregistry.v1+json" "$SR_URL/config/$TOPIC-value?defaultToGlobal=true" | jq .
+read -p "Press enter to continue"
+
+#------------------------------#
 ## Produce using current schema
-p ""
-p "Produce messages with the schema"
-wait
-pe "kafka-avro-console-producer \
+#------------------------------#
+echo
+echo "Produce messages with the schema -> {\"id\": \"1\",\"amount\": 10}"
+kafka-avro-console-producer \
     --broker-list $KAFKA_URL \
     --property schema.registry.url=$SR_URL \
     --topic $TOPIC \
-    --property value.schema='{\"type\": \"record\",\"name\": \"Payment\",\"namespace\": \"io.confluent.examples.clients.basicavro\",\"fields\": [{\"name\": \"id\",\"type\": \"string\"},{\"name\": \"amount\",\"type\": \"double\"}]}' << EOF
-{\"id\": \"1\",\"amount\": 10}
-{\"id\": \"2\",\"amount\": 10}
-{\"id\": \"3\",\"amount\": 10}
-{\"id\": \"5\",\"amount\": 10}
-{\"id\": \"6\",\"amount\": 10}
-{\"id\": \"4\",\"amount\": 10}
-{\"id\": \"7\",\"amount\": 10}
-EOF"
+    --property value.schema='{"type": "record","name": "Payment","namespace": "io.confluent.examples.clients.basicavro","fields": [{"name": "id","type": "string"},{"name": "amount","type": "double"}]}' << EOF
+{"id": "1","amount": 10}
+{"id": "2","amount": 10}
+{"id": "3","amount": 10}
+{"id": "5","amount": 10}
+{"id": "6","amount": 10}
+{"id": "4","amount": 10}
+{"id": "7","amount": 10}
+EOF
+read -p "Press enter to continue"
 
-wait
-#
-# # Register a schema via producing a message
-# ## Print new schema
-p ""
-p "Introducing a new schema via producing a message"
-wait
+#------------------------------#
+## Produce using incompatible schema
+#------------------------------#
+echo
+echo "Attempt to register an incompatible schema"
+echo
 echo "{
   \"type\": \"record\",
   \"name\": \"Payment\",
@@ -144,39 +138,137 @@ echo "{
     {
       \"name\": \"amount\",
       \"type\": \"double\"
-    },
+    }.
     {
       \"name\": \"newfield\",
       \"type\": \"string\"
     }
   ]
 }"
-wait
-
-pe "kafka-avro-console-producer \
+read -p "Press enter to continue"
+echo "Produce messages with the incompatible schema -> {\"id\": \"111\",\"amount\": 10,\"newfield\": \"sample123\"}"
+echo "kafka-avro-console-producer \
     --broker-list $KAFKA_URL \
     --property schema.registry.url=$SR_URL \
     --topic $TOPIC \
-    --property value.schema='{\"type\": \"record\",\"name\": \"Payment\",\"namespace\": \"io.confluent.examples.clients.basicavro\",\"fields\": [{\"name\": \"id\",\"type\": \"string\"},{\"name\": \"amount\",\"type\": \"double\"},{\"name\": \"newfield\", \"type\": \"string\"}]}' << EOF
-{\"id\": \"11\",\"amount\": 10,\"newfield\": \"sample123\"}
-{\"id\": \"22\",\"amount\": 10,\"newfield\": \"sample123\"}
-{\"id\": \"33\",\"amount\": 10,\"newfield\": \"sample123\"}
-{\"id\": \"44\",\"amount\": 10,\"newfield\": \"sample123\"}
-{\"id\": \"55\",\"amount\": 10,\"newfield\": \"sample123\"}
-{\"id\": \"66\",\"amount\": 10,\"newfield\": \"sample123\"}
-{\"id\": \"77\",\"amount\": 10,\"newfield\": \"sample123\"}
-EOF"
-wait
+    --property value.schema='{\"type\": \"record\",\"name\": \"Payment\",\"namespace\": \"io.confluent.examples.clients.basicavro\",\"fields\": [{\"name\": \"id\",\"type\": \"string\"},{\"name\": \"amount\",\"type\": \"double\"},{\"name\": \"newfield\", \"type\": \"string\"}]}'"
+kafka-avro-console-producer \
+    --broker-list $KAFKA_URL \
+    --property schema.registry.url=$SR_URL \
+    --topic $TOPIC \
+    --property value.schema='{"type": "record","name": "Payment","namespace": "io.confluent.examples.clients.basicavro","fields": [{"name": "id","type": "string"},{"name": "amount","type": "double"},{"name": "newfield", "type": "string"}]}' << EOF
+{"id": "111","amount": 10,"newfield": "sample123"}
+EOF
+read -p "Press enter to continue"
 
-p ""
-p "Consume the messages"
-wait
-pe "kafka-avro-console-consumer \
+#------------------------------#
+# Change Compatibility
+echo
+echo "Change the compatibility to NONE"
+echo "curl --silent --basic -X PUT -H \"Content-Type: application/vnd.schemaregistry.v1+json\" --data '{\"compatibility\":\"NONE\"}' $SR_URL/config/$TOPIC-value | jq ."
+curl --silent --basic -X PUT -H "Content-Type: application/vnd.schemaregistry.v1+json" --data '{"compatibility":"NONE"}' $SR_URL/config/$TOPIC-value | jq .
+read -p "Press enter to continue"
+
+echo "Try again -> {\"id\": \"111\",\"amount\": 10,\"newfield\": \"sample123\"}"
+echo "kafka-avro-console-producer \
+    --broker-list $KAFKA_URL \
+    --property schema.registry.url=$SR_URL \
+    --topic $TOPIC \
+    --property value.schema='{\"type\": \"record\",\"name\": \"Payment\",\"namespace\": \"io.confluent.examples.clients.basicavro\",\"fields\": [{\"name\": \"id\",\"type\": \"string\"},{\"name\": \"amount\",\"type\": \"double\"},{\"name\": \"newfield\", \"type\": \"string\"}]}'"
+kafka-avro-console-producer \
+    --broker-list $KAFKA_URL \
+    --property schema.registry.url=$SR_URL \
+    --topic $TOPIC \
+    --property value.schema='{"type": "record","name": "Payment","namespace": "io.confluent.examples.clients.basicavro","fields": [{"name": "id","type": "string"},{"name": "amount","type": "double"},{"name": "newfield", "type": "string"}]}' << EOF
+{"id": "111","amount": 10,"newfield": "sample123"}
+EOF
+
+
+#------------------------------#
+# Listing schema versions on our topic
+#------------------------------#
+echo
+echo "List the number of versions"
+echo "curl --silent --basic -X GET $SR_URL/subjects/$TOPIC-value/versions | jq ."
+curl --silent --basic -X GET $SR_URL/subjects/$TOPIC-value/versions | jq .
+read -p "Press enter to continue"
+
+echo
+echo "Consume the messages"
+kafka-avro-console-consumer \
     --bootstrap-server $KAFKA_URL \
     --property schema.registry.url=$SR_URL \
     --topic $TOPIC \
-    --from-beginning"
+    --from-beginning
 
-wait
-p "Fin"
+read -p "Press enter to continue"
+echo "Fin"
 
+# echo
+# echo "Register the same schema, but now backwards compatible -> {\"id\": \"111\",\"amount\": 10,\"newfield\": \"sample123\"}"
+# # Schema with backwards compatibility
+# echo "kafka-avro-console-producer \
+#     --broker-list $KAFKA_URL \
+#     --property schema.registry.url=$SR_URL \
+#     --topic $TOPIC \
+#     --property value.schema='{\"type\": \"record\",\"name\": \"Payment\",\"namespace\": \"io.confluent.examples.clients.basicavro\",\"fields\": [{\"name\": \"id\",\"type\": \"string\"},{\"name\": \"amount\",\"type\": \"double\"},{\"name\": \"newfield\", \"type\": [\"null\", \"string\"], \"default\": null}]}'"
+# kafka-avro-console-producer \
+#     --broker-list $KAFKA_URL \
+#     --property schema.registry.url=$SR_URL \
+#     --topic $TOPIC \
+#     --property value.schema='{"type": "record","name": "Payment","namespace": "io.confluent.examples.clients.basicavro","fields": [{"name": "id","type": "string"},{"name": "amount","type": "double"},{"name": "newfield", "type": ["null", "string"], "default": null}]}' << EOF
+# {"id": "111","amount": 10,"newfield": "sample123"}
+# {"id": "222","amount": 10}
+# EOF
+
+# # TODO:
+
+# # Change schema to none compatibilty
+# # Show screenshots of C3
+# # Consume
+
+# # wait
+
+# # wait
+
+# # #
+# # # # Register a schema via producing a message
+# # # ## Print new schema
+# # echo
+# # p "Introducing a new schema via producing a message"
+# # wait
+# # echo "{
+# #   \"type\": \"record\",
+# #   \"name\": \"Payment\",
+# #   \"namespace\": \"io.confluent.examples.clients.basicavro\",
+# #   \"fields\": [
+# #     {
+# #       \"name\": \"id\",
+# #       \"type\": \"string\"
+# #     },
+# #     {
+# #       \"name\": \"amount\",
+# #       \"type\": \"double\"
+# #     },
+# #     {
+# #       \"name\": \"newfield\",
+# #       \"type\": \"string\"
+# #     }
+# #   ]
+# # }"
+# # wait
+
+# # pe "kafka-avro-console-producer \
+# #     --broker-list $KAFKA_URL \
+# #     --property schema.registry.url=$SR_URL \
+# #     --topic $TOPIC \
+# #     --property value.schema='{\"type\": \"record\",\"name\": \"Payment\",\"namespace\": \"io.confluent.examples.clients.basicavro\",\"fields\": [{\"name\": \"id\",\"type\": \"string\"},{\"name\": \"amount\",\"type\": \"double\"},{\"name\": \"newfield\", \"type\": \"string\"}]}' << EOF
+# # {\"id\": \"11\",\"amount\": 10,\"newfield\": \"sample123\"}
+# # {\"id\": \"22\",\"amount\": 10,\"newfield\": \"sample123\"}
+# # {\"id\": \"33\",\"amount\": 10,\"newfield\": \"sample123\"}
+# # {\"id\": \"44\",\"amount\": 10,\"newfield\": \"sample123\"}
+# # {\"id\": \"55\",\"amount\": 10,\"newfield\": \"sample123\"}
+# # {\"id\": \"66\",\"amount\": 10,\"newfield\": \"sample123\"}
+# # {\"id\": \"77\",\"amount\": 10,\"newfield\": \"sample123\"}
+# # EOF"
+# # wait
