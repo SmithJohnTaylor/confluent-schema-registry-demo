@@ -14,3 +14,6 @@ An automated walk-through demo of some key features in Confluent Schema Registry
 `schema-demo.sh [topic name]`
 
 Please refer to the [playbook](playbook.md)
+
+## Updates
+Coming soon - Confluent Cloud script
