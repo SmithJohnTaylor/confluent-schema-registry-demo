@@ -178,6 +178,7 @@ read -p "Press enter to continue"
 
 #------------------------------#
 # Change Compatibility
+#------------------------------#
 echo
 echo -e "${GREEN}Change the compatibility to NONE${NC}"
 echo "curl --silent --basic -X PUT -H \"Content-Type: application/vnd.schemaregistry.v1+json\" --data '{\"compatibility\":\"NONE\"}' $SR_URL/config/$TOPIC-value | jq ."
