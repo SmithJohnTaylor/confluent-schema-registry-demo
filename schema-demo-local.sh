@@ -9,7 +9,7 @@ KAFKA_URL=localhost:9092
 SR_URL=http://localhost:8081
 #------------------------------#
 
-TOPIC=$1
+TOPIC=${1:-dummy-topic}
 
 echo -e "${GREEN}TopicName${NC}"
 echo $TOPIC
