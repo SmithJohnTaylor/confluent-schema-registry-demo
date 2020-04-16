@@ -9,9 +9,11 @@ An automated walk-through demo of some key features in Confluent Schema Registry
 - [Confluent CLI](https://docs.confluent.io/current/cli/installing.html) - to interact with the Kafka brokers
 
 ## Usage
-`schema-demo.sh [topic name]`
-
 Please refer to the [playbook](playbook.md)
+### Local Environment (Confluent Platform)
+`schema-demo-local.sh [topic name]`
+### Confluent Cloud Environment
+`schema-demo-cloud.sh [topic name]`
 
 ## Updates
 Coming soon - Confluent Cloud script
