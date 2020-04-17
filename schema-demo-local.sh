@@ -12,10 +12,11 @@ SR_URL=http://localhost:8081
 TOPIC=$1
 if [ -z "$TOPIC" ] 
 then
-  echo "Please specify your topic and run script again: ./schema-demo-local.sh <topic>"
-  exit 1
+  echo "Topic not specified. Defaulting topic to: schema-demo-topic"
+  TOPIC="schema-demo-topic"
 fi
 
+echo
 echo -e "${GREEN}TopicName${NC}"
 echo $TOPIC
 
