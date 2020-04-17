@@ -13,7 +13,8 @@ Please refer to the [playbook](playbook.md)
 ### Local Environment (Confluent Platform)
 `schema-demo-local.sh [topic name]`
 ### Confluent Cloud Environment
-`schema-demo-cloud.sh [topic name]`
+`schema-demo-cloud.sh [topic name] [path to cconfig]`
+
+Please refer to [cconfig](cconfig) and enter your creds for your CC environment.
 
 ## Updates
-Coming soon - Confluent Cloud script
