@@ -16,5 +16,7 @@ Please refer to the [playbook](playbook.md)
 `schema-demo-cloud.sh [topic name] [path to cconfig]`
 
 Please refer to [cconfig](cconfig) and enter your creds for your CC environment.
+You can find the access information in your CC cluster under the "Tools & client configuration" section
+![access_info](resources/access_info.png)
 
 ## Updates
