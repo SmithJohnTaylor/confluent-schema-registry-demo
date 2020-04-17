@@ -15,6 +15,7 @@ fi
 KAFKA_URL=$(cat $PATH_TO_CCONFIG | grep bootstrap.servers | awk '{split($0,a,"="); print a[2]}')
 SR_URL=$(cat $PATH_TO_CCONFIG | grep schema.registry.url | awk '{split($0,a,"="); print a[2]}')
 SR_AUTH="$(cat $PATH_TO_CCONFIG | grep schema.registry.basic.auth.user.info | awk '{split($0,a,"="); print a[2]}')"
+SR_AUTH="${SR_AUTH@Q}"
 
 if [ -z "$KAFKA_URL" ] || [ -z "$SR_URL" ] || [ -z "$SR_AUTH" ]
 then
